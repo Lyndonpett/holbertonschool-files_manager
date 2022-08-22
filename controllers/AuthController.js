@@ -7,7 +7,7 @@ const users = DB.db.collection('users');
 
 class AuthController {
   static getConnect(req, res) {
-    (async() => {
+    (async () => {
       const header = req.headers.authorization;
       const newBuffer = Buffer.from(header.split(6), 'base64');
       const [email, password] = newBuffer.toString('utf-8').split(':');
@@ -28,7 +28,7 @@ class AuthController {
   }
 
   static getDisconnect(req, res) {
-    (async() => {
+    (async () => {
       const header = req.headers.['x-token'];
       const key = `auth_${header}`;
       if (await Redis.get(key)) {

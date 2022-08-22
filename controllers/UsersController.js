@@ -1,13 +1,13 @@
 const Redis = require('../utils/redis');
-const DB = require('../utils/db');
+const dbClient = require('../utils/db');
 const sha1 = require('sha1');
 const { ObjectID } = require('mongodb');
 
-const users = DB.db.collection('users');
+const users = dbClient.db.collection('users');
 
 class UsersController {
   static postNew(req, res) {
-    (async() => {
+    (async () => {
       const { email, password } = req.body;
 
       if (!email) {
@@ -31,7 +31,7 @@ class UsersController {
   }
 
   static getMe(req, res) {
-    (async() => {
+    (async () => {
       const header = req.headers['x-token'];
       const key = `auth_${header}`;
       const redDiss = await Redis.get(key);
