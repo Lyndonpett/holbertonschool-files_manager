@@ -1,7 +1,7 @@
-const Redis = require('../utils/redis');
-const dbClient = require('../utils/db');
 const sha1 = require('sha1');
 const { ObjectID } = require('mongodb');
+const Redis = require('../utils/redis');
+const dbClient = require('../utils/db');
 
 const users = dbClient.db.collection('users');
 
