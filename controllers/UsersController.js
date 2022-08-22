@@ -2,7 +2,7 @@ const Redis = require('../utils/redis');
 const DB = require('../utils/db');
 const sha1 = require('sha1');
 
-const users = dbClient.db.collection('users');
+const users = DB.db.collection('users');
 
 class UsersController {
   static postNew(req, res) {
