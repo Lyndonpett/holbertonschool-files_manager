@@ -25,8 +25,7 @@ class DBClient {
 
   async nbUsers() {
     try {
-      const countUsers = this.db.collection('users');
-      return countUsers.countDocuments({});
+      return this.db.collection('users').count();
     } catch (err) {
       console.log(err);
       return 0;
@@ -35,8 +34,7 @@ class DBClient {
 
   async nbFiles() {
     try {
-      const countFiles = this.db.collection('files');
-      return countFiles.countDocuments({});
+      return this.db.collection('files').count();
     } catch (err) {
       console.log(err);
       return 0;
