@@ -3,8 +3,6 @@ const { ObjectID } = require('mongodb');
 const Redis = require('../utils/redis');
 const dbClient = require('../utils/db');
 
-const users = dbClient.db.collection('users');
-
 class UsersController {
   static postNew(req, res) {
     (async () => {
@@ -18,15 +16,16 @@ class UsersController {
         return res.status(400).json({ error: 'Missing password' });
       }
 
-      if (await users.findOne({ email })) {
+      const user = await dbClient.collection('users').findOne({ email });
+      if (user) {
         return res.status(400).json({ error: 'Already exists' });
       }
 
-      const passwordHash = sha1(password);
-      const user = { email, password: passwordHash };
-      const created = await users.insertOne(user);
-
-      return res.status(201).json({ id: created.insertedId, email });
+      const hash = sha1(password);
+      const newUser = await dbClient
+        .collection('users')
+        .insertOne({ email, password: hash });
+      return res.status(201).send({ id: newUser.insertedId, email });
     })();
   }
 
