@@ -1,6 +1,6 @@
 const sha1 = require('sha1');
-const { ObjectID } = require('mongodb');
-const Redis = require('../utils/redis');
+// const { ObjectID } = require('mongodb');
+// const Redis = require('../utils/redis');
 const dbClient = require('../utils/db');
 
 class UsersController {
@@ -29,19 +29,19 @@ class UsersController {
     })();
   }
 
-  static getMe(req, res) {
-    (async () => {
-      const header = req.headers['x-token'];
-      const key = `auth_${header}`;
-      const redDiss = await Redis.get(key);
-      if (redDiss) {
-        const userId = new ObjectID(redDiss);
-        const user = await users.findOne({ _id: userId });
-        return res.json({ id: redDiss, email: user.email });
-      }
-      return res.status(401).json({ error: 'Unauthorized' });
-    })();
-  }
+  //   static getMe(req, res) {
+  //     (async () => {
+  //       const header = req.headers['x-token'];
+  //       const key = `auth_${header}`;
+  //       const redDiss = await Redis.get(key);
+  //       if (redDiss) {
+  //         const userId = new ObjectID(redDiss);
+  //         const user = await users.findOne({ _id: userId });
+  //         return res.json({ id: redDiss, email: user.email });
+  //       }
+  //       return res.status(401).json({ error: 'Unauthorized' });
+  //     })();
+  //   }
 }
 
 module.exports = UsersController;
