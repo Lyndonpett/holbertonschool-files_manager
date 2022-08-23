@@ -16,13 +16,13 @@ class UsersController {
         return res.status(400).json({ error: 'Missing password' });
       }
 
-      const user = await dbClient.collection('users').findOne({ email });
+      const user = await dbClient.db.collection('users').findOne({ email });
       if (user) {
         return res.status(400).json({ error: 'Already exists' });
       }
 
       const hash = sha1(password);
-      const newUser = await dbClient
+      const newUser = await dbClient.db
         .collection('users')
         .insertOne({ email, password: hash });
       return res.status(201).send({ id: newUser.insertedId, email });
