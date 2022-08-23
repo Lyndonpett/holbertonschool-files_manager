@@ -14,7 +14,13 @@ class FilesController {
         return res.status(401).json({ error: 'Unauthorized' });
       }
 
-      const { name, type, data, isPublic = false, parentId = 0 } = req.body;
+      const {
+        name,
+        type,
+        data,
+        isPublic = false,
+        parentId = 0,
+      } = req.body;
 
       if (!name) {
         return res.status(400).json({ error: 'Missing name' });
