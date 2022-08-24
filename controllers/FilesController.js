@@ -6,7 +6,7 @@ const dbClient = require('../utils/db');
 
 class FilesController {
   static postUpload(req, res) {
-    (async() => {
+    (async () => {
       const token = req.headers['x-token'];
       const key = await Redis.get(`auth_${token}`);
 
@@ -14,7 +14,9 @@ class FilesController {
         return res.status(401).json({ error: 'Unauthorized' });
       }
 
-      const { name, type, data, isPublic = false, parentId = 0 } = req.body;
+      const {
+        name, type, data, isPublic = false, parentId = 0,
+      } = req.body;
 
       if (!name) {
         return res.status(400).json({ error: 'Missing name' });
@@ -50,7 +52,7 @@ class FilesController {
           name,
           type,
           isPublic,
-          parentId
+          parentId,
         });
       } else {
         const FOLDER_PATH = process.env.FOLDER_PATH || '/tmp/files_manager';
@@ -70,7 +72,7 @@ class FilesController {
           type,
           isPublic,
           parentId,
-          filePath
+          filePath,
         });
       }
 
@@ -80,7 +82,7 @@ class FilesController {
         name,
         type,
         isPublic,
-        parentId
+        parentId,
       });
     })().catch((err) => {
       console.log(err);
@@ -89,7 +91,7 @@ class FilesController {
   }
 
   static getShow(req, res) {
-    (async() => {
+    (async () => {
       const token = req.headers['x-token'];
       const user = await Redis.get(`auth_${token}`);
 
@@ -116,13 +118,13 @@ class FilesController {
         name: file.name,
         type: file.type,
         isPublic: file.isPublic,
-        parentId: file.parentId
+        parentId: file.parentId,
       });
     })();
   }
 
   static getIndex(req, res) {
-    (async() => {
+    (async () => {
       const token = req.headers['x-token'];
       const user = await Redis.get(`auth_${token}`);
 
@@ -140,7 +142,7 @@ class FilesController {
           .aggregate([
             { $match: { parentId: new mongo.ObjectID(parentId) } },
             { $skip: page * 20 },
-            { $limit: 20 }
+            { $limit: 20 },
           ])
           .toArray();
       } else {
@@ -149,7 +151,7 @@ class FilesController {
           .aggregate([
             { $match: { userId: new mongo.ObjectID(user) } },
             { $skip: page * 20 },
-            { $limit: 20 }
+            { $limit: 20 },
           ])
           .toArray();
       }
@@ -160,7 +162,7 @@ class FilesController {
         name: file.name,
         type: file.type,
         isPublic: file.isPublic,
-        parentId: file.parentId
+        parentId: file.parentId,
       }));
 
       return res.status(200).send(returnFile);
@@ -168,7 +170,7 @@ class FilesController {
   }
 
   static putPublish(req, res) {
-    (async() => {
+    (async () => {
       const token = req.headers['x-token'];
       const user = await Redis.get(`auth_${token}`);
 
@@ -197,13 +199,13 @@ class FilesController {
         name: file.name,
         type: file.type,
         isPublic: file.isPublic,
-        parentId: file.parentId
+        parentId: file.parentId,
       });
     })();
   }
 
   static putUnpublish(req, res) {
-    (async() => {
+    (async () => {
       const token = req.headers['x-token'];
       const user = await Redis.get(`auth_${token}`);
 
@@ -232,13 +234,13 @@ class FilesController {
         name: file.name,
         type: file.type,
         isPublic: file.isPublic,
-        parentId: file.parentId
+        parentId: file.parentId,
       });
     })();
   }
 
   static getFile(req, res) {
-    (async() => {
+    (async () => {
       const token = req.headers['x-token'];
       const user = await Redis.get(`auth_${token}`);
       const file = await dbClient.db
