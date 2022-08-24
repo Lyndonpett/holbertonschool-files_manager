@@ -6,7 +6,7 @@ const dbClient = require('../utils/db');
 
 class FilesController {
   static postUpload(req, res) {
-    (async () => {
+    (async() => {
       const token = req.headers['x-token'];
       const key = await Redis.get(`auth_${token}`);
 
@@ -14,9 +14,7 @@ class FilesController {
         return res.status(401).json({ error: 'Unauthorized' });
       }
 
-      const {
-        name, type, data, isPublic = false, parentId = 0,
-      } = req.body;
+      const { name, type, data, isPublic = false, parentId = 0 } = req.body;
 
       if (!name) {
         return res.status(400).json({ error: 'Missing name' });
@@ -52,7 +50,7 @@ class FilesController {
           name,
           type,
           isPublic,
-          parentId,
+          parentId
         });
       } else {
         const FOLDER_PATH = process.env.FOLDER_PATH || '/tmp/files_manager';
@@ -72,7 +70,7 @@ class FilesController {
           type,
           isPublic,
           parentId,
-          filePath,
+          filePath
         });
       }
 
@@ -82,7 +80,7 @@ class FilesController {
         name,
         type,
         isPublic,
-        parentId,
+        parentId
       });
     })().catch((err) => {
       console.log(err);
@@ -91,7 +89,7 @@ class FilesController {
   }
 
   static getShow(req, res) {
-    (async () => {
+    (async() => {
       const token = req.headers['x-token'];
       const user = await Redis.get(`auth_${token}`);
 
@@ -118,13 +116,13 @@ class FilesController {
         name: file.name,
         type: file.type,
         isPublic: file.isPublic,
-        parentId: file.parentId,
+        parentId: file.parentId
       });
     })();
   }
 
   static getIndex(req, res) {
-    (async () => {
+    (async() => {
       const token = req.headers['x-token'];
       const user = await Redis.get(`auth_${token}`);
 
@@ -142,7 +140,7 @@ class FilesController {
           .aggregate([
             { $match: { parentId: new mongo.ObjectID(parentId) } },
             { $skip: page * 20 },
-            { $limit: 20 },
+            { $limit: 20 }
           ])
           .toArray();
       } else {
@@ -151,7 +149,7 @@ class FilesController {
           .aggregate([
             { $match: { userId: new mongo.ObjectID(user) } },
             { $skip: page * 20 },
-            { $limit: 20 },
+            { $limit: 20 }
           ])
           .toArray();
       }
@@ -162,7 +160,7 @@ class FilesController {
         name: file.name,
         type: file.type,
         isPublic: file.isPublic,
-        parentId: file.parentId,
+        parentId: file.parentId
       }));
 
       return res.status(200).send(returnFile);
@@ -170,7 +168,7 @@ class FilesController {
   }
 
   static putPublish(req, res) {
-    (async () => {
+    (async() => {
       const token = req.headers['x-token'];
       const user = await Redis.get(`auth_${token}`);
 
@@ -199,13 +197,13 @@ class FilesController {
         name: file.name,
         type: file.type,
         isPublic: file.isPublic,
-        parentId: file.parentId,
+        parentId: file.parentId
       });
     })();
   }
 
   static putUnpublish(req, res) {
-    (async () => {
+    (async() => {
       const token = req.headers['x-token'];
       const user = await Redis.get(`auth_${token}`);
 
@@ -234,8 +232,37 @@ class FilesController {
         name: file.name,
         type: file.type,
         isPublic: file.isPublic,
-        parentId: file.parentId,
+        parentId: file.parentId
       });
+    })();
+  }
+
+  static getFile(req, res) {
+    (async() => {
+      const token = req.headers['x-token'];
+      const user = await Redis.get(`auth_${token}`);
+      const file = await dbClient.db
+        .collection('files')
+        .findOne({ _id: new mongo.ObjectID(req.params.id) });
+
+      if (!file) {
+        return res.status(404).json({ error: 'Not found' });
+      }
+
+      if (!file.isPublic && (!user || user !== file.userId.toString())) {
+        return res.status(404).json({ error: 'Not found' });
+      }
+
+      if (file.type === 'folder') {
+        return res.status(400).json({ error: "A folder doesn't have content" });
+      }
+
+      if (!fs.existsSync(file.localPath)) {
+        return res.status(404).json({ error: 'Not found' });
+      }
+
+      const data = fs.readFileSync(file.localPath);
+      return res.status(200).send(data);
     })();
   }
 }
