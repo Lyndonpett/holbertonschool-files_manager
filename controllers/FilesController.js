@@ -15,11 +15,7 @@ class FilesController {
       }
 
       const {
-        name,
-        type,
-        data,
-        isPublic = false,
-        parentId = 0,
+        name, type, data, isPublic = false, parentId = 0,
       } = req.body;
 
       if (!name) {
@@ -170,6 +166,76 @@ class FilesController {
       }));
 
       return res.status(200).send(returnFile);
+    })();
+  }
+
+  static putPublish(req, res) {
+    (async () => {
+      const token = req.headers['x-token'];
+      const user = await Redis.get(`auth_${token}`);
+
+      if (!user) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      const { id } = req.params;
+      const file = await dbClient.db
+        .collection('files')
+        .findOne({ _id: new mongo.ObjectID(id) });
+
+      if (!file) {
+        return res.status(404).json({ error: 'Not found' });
+      }
+
+      if (user !== file.userId.toString()) {
+        return res.status(404).json({ error: 'Not found' });
+      }
+
+      file.isPublic = true;
+
+      return res.status(200).send({
+        id: file._id,
+        userId: file.userId,
+        name: file.name,
+        type: file.type,
+        isPublic: file.isPublic,
+        parentId: file.parentId,
+      });
+    })();
+  }
+
+  static putUnpublish(req, res) {
+    (async () => {
+      const token = req.headers['x-token'];
+      const user = await Redis.get(`auth_${token}`);
+
+      if (!user) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      const { id } = req.params;
+      const file = await dbClient.db
+        .collection('files')
+        .findOne({ _id: new mongo.ObjectID(id) });
+
+      if (!file) {
+        return res.status(404).json({ error: 'Not found' });
+      }
+
+      if (user !== file.userId.toString()) {
+        return res.status(404).json({ error: 'Not found' });
+      }
+
+      file.isPublic = false;
+
+      return res.status(200).send({
+        id: file._id,
+        userId: file.userId,
+        name: file.name,
+        type: file.type,
+        isPublic: file.isPublic,
+        parentId: file.parentId,
+      });
     })();
   }
 }
